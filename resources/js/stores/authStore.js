@@ -82,7 +82,16 @@ const mutations = {
     $cookies.set('userData', JSON.stringify(userData.user))
     $cookies.set('userToken', userData.token)
     axios.defaults.headers.common.Authorization = `Bearer ${userData.token}`
-    axios.defaults.baseURL = 'http://localhost:8000/api';
+
+    const app_status = process.env.MIX_FRONTEND_ENV !== undefined ? process.env.MIX_FRONTEND_ENV : 'production';
+
+    if( app_status === 'localhost')
+    {
+      axios.defaults.baseURL = 'http://localhost:8000/api';
+    } else if( app_status === 'production' ) {
+      axios.defaults.baseURL = 'http://website.almono.info/api';
+    }
+
   },
 
   setUserToken(state, newToken) {

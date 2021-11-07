@@ -17,7 +17,17 @@ import {i18n} from "./plugins/i18n";
 import axios from "axios/index";
 
 Vue.use(Router);
-// base process.env.BASE_URL
+
+const app_status = process.env.MIX_FRONTEND_ENV !== undefined ? process.env.MIX_FRONTEND_ENV : 'production';
+
+let baseUrl = '';
+
+if( app_status === 'localhost')
+{
+  baseUrl = '/portfolio/public'
+} else if( app_status === 'production' ) {
+  baseUrl = ''
+}
 
 let router = new Router({
     mode: 'history',
