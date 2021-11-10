@@ -11,6 +11,9 @@
             <div v-if="invalidReset" class="col-12 px-0">
               <span>{{ $t('resetNotExecutedError', 'resetNotExecutedError') }}</span>
             </div>
+            <div v-else>
+              <span>{{ $t('passwordResetSuccessfully', 'passwordResetSuccessfully') }}</span>
+            </div>
 
             <div class="col-12 px-0 mb-2">
               <small class="forgot-link">

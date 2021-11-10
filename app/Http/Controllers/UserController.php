@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use JWTAuth;
 use Auth;
+use Mail;
 use App\Models\User;
 use App\Models\UserRole;
 use App\Models\UserFollower;
@@ -478,14 +479,27 @@ class UserController extends Controller
             return response($result);
         }
 
-        if(Req::createRequest('forgot_password', $user['id'])) {
-            /*
-             * SEND EMAIL TO USER
-             */
-            $result['status'] = 'success';
+        $resetToken = Req::createRequest('forgot_password', $user['id']);
+
+        if($resetToken) {
+            try {
+                $resetUrl = getenv('BASE_URL') . "/resetPassword/" . $user['id'] . "/" . $resetToken->request_token;
+
+                Mail::send('emails.forgotPassword', ['resetUrl' => $resetUrl], function($message) use ($user)
+                {
+                    $message->to($user['email']);
+                    $message->subject('Password Reset Request for almono.info');
+                });
+
+                $result['status'] = 'success';
+                $result['message'] = 'forgotPasswordMailSuccess';
+            } catch (\Exception $e) {
+                $result['message'] = 'forgotPasswordMailError';
+            }
+        } else {
+            $result['message'] = 'forgotPasswordMailError';
         }
 
-        $result['message'] = 'forgotRequestError';
         return response($result);
     }
 
@@ -510,8 +524,9 @@ class UserController extends Controller
         }
 
         $resetToken = Req::where([
-            ['type', 'forgot_password'],
-            ['user_id', $user->id],
+            ['request_type', 'forgot_password'],
+            ['request_user', $user->id],
+            ['request_token', $token],
             ['is_active', '1']
         ])->get()->first();
 
@@ -523,15 +538,15 @@ class UserController extends Controller
         $userNewPassword = User::generateRandomPassword();
 
         try {
-            Reg::where('id', $resetToken['id'])->delete();
+            Req::where('id', $resetToken['id'])->delete();
             $user->password = Hash::make($userNewPassword);
             $user->save();
 
-            /*
-             *
-             * SEND EMAIL THAT PASSWORD WAS RESET TO MAIN USER
-             *
-             */
+            Mail::send('emails.passwordResetConfirmation', [], function($message) use ($user)
+            {
+                $message->to($user->email);
+                $message->subject('Password for ' . $user->email . ' has been reset');
+            });
         } catch (\Exception $e) {
             $result['message'] = 'passwordResetError';
             return response($result);

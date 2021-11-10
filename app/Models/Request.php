@@ -11,7 +11,7 @@ class Request extends Model
 {
     protected $table = 'requests';
 
-    public function createRequest($type, $userId) {
+    public static function createRequest($type, $userId) {
         $req = new self();
         $req->request_type = $type;
         $req->request_user = $userId;
@@ -19,10 +19,9 @@ class Request extends Model
 
         try {
             $req->save();
+            return $req;
         } catch (\Exception $e) {
             return false;
         }
-
-        return true;
     }
 }
