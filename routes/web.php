@@ -12,8 +12,10 @@ Route::prefix('api')->group(function () {
     Route::get('/getCVData', 'App\Http\Controllers\PersonalController@getCurriculumData');
     Route::post('/validateToken', 'App\Http\Controllers\UserController@validateToken')->name('validate_token');
 
+    // PASSWORDS
     Route::post('/forgotPassword', 'App\Http\Controllers\UserController@forgotPassword');
     Route::get('/resetPassword/{userId}/{token}', 'App\Http\Controllers\UserController@resetPassword');
+    Route::post('/setNewPassword', 'App\Http\Controllers\UserController@setNewPassword');
 
     // CRYPTO
     Route::post('/getCryptoNews', 'App\Http\Controllers\CryptoController@getCryptoNews');

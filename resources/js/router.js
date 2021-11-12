@@ -31,7 +31,7 @@ if( app_status === 'localhost')
 
 let router = new Router({
     mode: 'history',
-    base: '/portfolio/public',
+    base: baseUrl,
     linkActiveClass: 'is-active',
     routes: [
         {

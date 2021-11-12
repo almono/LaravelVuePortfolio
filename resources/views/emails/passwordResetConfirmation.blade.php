@@ -7,6 +7,7 @@
 <div class="email-content">
     <p>Your password on almono.info has been reset.</p>
     <p>If you did not make this change please contact administrator.</p>
+    <p>IP that requested the change: {{ $ip }}</p>
 </div>
 </body>
 

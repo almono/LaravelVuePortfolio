@@ -9,16 +9,44 @@
           <div class="card-body">
 
             <div v-if="invalidReset" class="col-12 px-0">
-              <span>{{ $t('resetNotExecutedError', 'resetNotExecutedError') }}</span>
+              <span>{{ $t(errorMsg, errorMsg) }}</span>
             </div>
-            <div v-else>
-              <span>{{ $t('passwordResetSuccessfully', 'passwordResetSuccessfully') }}</span>
-            </div>
+            <div v-else-if="successReset">
+              <template v-if="!passwordChanged">
+                <span style="color: gray;" class="mb-2">{{ $t('setNewPasswordText', 'setNewPasswordText') }}</span>
+                <b-form @submit="submitNewPassword">
+                  <b-form-group
+                      id="fieldset-1"
+                      :label=" $t('newPasswordLabel', 'newPasswordLabel')"
+                      label-for="input-1"
+                      class="login-label mb-0"
+                  >
+                    <b-form-input class="login-input" id="input-1" v-model="newPassword" trim></b-form-input>
+                  </b-form-group>
+                  <b-form-group
+                      id="fieldset-2"
+                      :label=" $t('confirmPasswordLabel', 'confirmPasswordLabel')"
+                      label-for="input-2"
+                      class="login-label mb-0"
+                  >
+                    <b-form-input class="login-input" id="input-2" v-model="newPasswordConfirm" trim></b-form-input>
+                  </b-form-group>
 
-            <div class="col-12 px-0 mb-2">
-              <small class="forgot-link">
+                  <div class="col-12 px-0" v-if="wrongPasswords">
+                    <span>{{ $t('passwordsNotMatchingWarning', 'passwordsNotMatchingWarning') }}</span>
+                  </div>
+                  <div class="col-12 px-0" v-if="emptyFields">
+                    <span>{{ $t('inputsNotFilledWarning', 'inputsNotFilledWarning') }}</span>
+                  </div>
+                  <div class="col-12 px-0">
+                    <b-button class="submit-btn mt-3 w-100" type="submit" variant="primary">{{ $t('sendNewPasswordBtn', 'sendNewPasswordBtn') }}</b-button>
+                  </div>
+                </b-form>
+              </template>
+              <template v-else>
+                <p>{{ $t('passwordHasBeenChangedConfirmation', 'passwordHasBeenChangedConfirmation') }}</p>
                 <router-link class="forgot-link" :to="{ name: 'Login'}">{{ $t('backToLoginLink', 'backToLoginLink') }}</router-link>
-              </small>
+              </template>
             </div>
           </div>
         </div>
@@ -33,6 +61,13 @@ export default {
   data() {
     return {
       resetInvalid: false,
+      successReset: false,
+      newPassword: null,
+      newPasswordConfirm: null,
+      wrongPasswords: false,
+      emptyFields: false,
+      passwordChanged: false,
+      errorMsg: null,
       userId: this.$route.query.user ? this.$route.query.user : null,
       userToken: this.$route.query.token ? this.$route.query.token : null
     }
@@ -45,15 +80,48 @@ export default {
     resetPassword() {
       if(this.userId && this.userToken) {
         this.$store.dispatch('authStore/resetPassword',
-            {
-              userId: this.userId,
-              userToken: this.userToken
-            }).then((response) => {
-          console.log('test')
+        {
+          userId: this.userId,
+          userToken: this.userToken
+        }).then((response) => {
+
+          if(response && response.status) {
+            if(response.status === 'success') {
+              this.successReset = true
+              this.invalidReset = false
+            } else {
+              this.invalidReset = true
+              this.errorMsg = response.message
+            }
+          }
         })
       } else {
-        console.log('bbb')
         this.resetInvalid = true
+      }
+    },
+    submitNewPassword(event) {
+      event.preventDefault()
+      this.wrongPasswords = false
+      this.emptyFields = false
+
+      if(this.newPassword && this.newPasswordConfirm) {
+        if(this.newPassword === this.newPasswordConfirm) {
+          this.$store.dispatch('authStore/setNewPassword',
+          {
+            newPassword: this.newPassword,
+            userId: this.userId
+          }).then((response) => {
+            if(response && response.status) {
+              if(response.status === 'success') {
+                this.passwordChanged = true;
+              }
+            }
+          })
+        } else {
+          this.wrongPasswords = true
+        }
+      } else {
+        this.emptyFields = true
       }
     }
   },
@@ -83,13 +151,6 @@ export default {
     font-size: 14px;
     color: #588B8B;
   }
-  .forgot-link {
-    color: #588B8B;
-  }
-  .forgot-link:hover {
-    font-weight: 600;
-    cursor: pointer;
-  }
   .login-title {
     font-weight: 600;
     color: #588B8B;
@@ -101,18 +162,8 @@ export default {
     border-radius: 0px;
     border-color: #65A2A282;
   }
-
-  .forgot-submit-btn {
-    border-radius: 0px;
-    background-color: #588B8B;
-    border: none;
-    width: 200px;
+  .submit-btn {
+    width: 100%;
+    text-align: center;
   }
-  .forgot-submit-btn:hover, .forgot-submit-btn:focus {
-    background-color: #366060;
-  }
-  .forgot-submit-btn:active {
-    background-color: #274f4f !important;
-  }
-
 </style>

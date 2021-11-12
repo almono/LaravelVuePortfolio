@@ -72,6 +72,12 @@ const actions = {
       return response.data
     })
   },
+
+  async setNewPassword( context, data ) {
+    return await axios.post(`${backendUrl()}/setNewPassword`, data).then(response => {
+      return response.data
+    })
+  }
 };
 
 const mutations = {

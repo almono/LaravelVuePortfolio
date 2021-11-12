@@ -453,7 +453,6 @@ class UserController extends Controller
     public function followCryptoCoin(Request $request) {
         $token = \JWTAuth::getToken();
         $tokenData = \JWTAuth::getPayload($token);
-        $userData = $tokenData['user'];
         $data = $request->all();
         $result['status'] = 'error';
 
@@ -506,6 +505,7 @@ class UserController extends Controller
     public function resetPassword(Request $request) {
         $userId = $request->userId;
         $token = $request->token;
+        $result['status'] = 'error';
 
         if(!isset($userId) || is_null($userId)) {
             $result['message'] = 'invalidUserProvidedError';
@@ -533,27 +533,57 @@ class UserController extends Controller
         if(is_null($resetToken)) {
             $result['message'] = 'tokenNotFoundError';
             return response($result);
+        } else {
+
+            try {
+                Req::where('id', $resetToken['id'])->delete();
+            } catch (\Exception $e) {
+                $result['message'] = 'failedToUseToken';
+                return response($result);
+            }
+
+            $result['status'] = 'success';
+            $result['message'] = '';
+            return response($result);
+        }
+    }
+    
+    public function setNewPassword(Request $request) {
+        $data = $request->all();
+        $result['status'] = 'error';
+
+        if(!isset($data['newPassword']) || is_null($data['newPassword'])) {
+            $result['message'] = 'providedPasswordIsInvalid';
+            return response($result);
         }
 
-        $userNewPassword = User::generateRandomPassword();
+        if(!isset($data['userId']) || is_null($data['userId'])) {
+            $result['message'] = 'providedUserIsInvalid';
+            return response($result);
+        }
+
+        $user = User::find($data['userId']);
+
+        if(is_null($user)) {
+            $result['message'] = 'userInvalidOrNotFoundError';
+            return response($result);
+        }
 
         try {
-            Req::where('id', $resetToken['id'])->delete();
-            $user->password = Hash::make($userNewPassword);
+            $user->password = Hash::make($data['newPassword']);
             $user->save();
+            $result['status'] = 'success';
+            $result['message'] = 'passwordChangeSuccess';
 
-            Mail::send('emails.passwordResetConfirmation', [], function($message) use ($user)
+            Mail::send('emails.passwordResetConfirmation', ['ip' => $request->ip()], function($message) use ($user)
             {
                 $message->to($user->email);
                 $message->subject('Password for ' . $user->email . ' has been reset');
             });
         } catch (\Exception $e) {
-            $result['message'] = 'passwordResetError';
-            return response($result);
+            $result['message'] = 'passwordChangeError';
         }
 
-        $result['status'] = 'success';
-        $result['message'] = 'passwordResetSuccess';
         return response($result);
     }
 
