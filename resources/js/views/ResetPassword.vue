@@ -21,7 +21,7 @@
                       label-for="input-1"
                       class="login-label mb-0"
                   >
-                    <b-form-input class="login-input" id="input-1" v-model="newPassword" trim></b-form-input>
+                    <b-form-input type="password" class="login-input" id="input-1" v-model="newPassword" trim></b-form-input>
                   </b-form-group>
                   <b-form-group
                       id="fieldset-2"
@@ -29,7 +29,7 @@
                       label-for="input-2"
                       class="login-label mb-0"
                   >
-                    <b-form-input class="login-input" id="input-2" v-model="newPasswordConfirm" trim></b-form-input>
+                    <b-form-input type="password" class="login-input" id="input-2" v-model="newPasswordConfirm" trim></b-form-input>
                   </b-form-group>
 
                   <div class="col-12 px-0" v-if="wrongPasswords">
