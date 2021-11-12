@@ -482,7 +482,7 @@ class UserController extends Controller
 
         if($resetToken) {
             try {
-                $resetUrl = getenv('BASE_URL') . "/resetPassword/" . $user['id'] . "/" . $resetToken->request_token;
+                $resetUrl = getenv('BASE_URL') . "/reset_password?user=" . $user['id'] . "&token=" . $resetToken->request_token;
 
                 Mail::send('emails.forgotPassword', ['resetUrl' => $resetUrl], function($message) use ($user)
                 {
