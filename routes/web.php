@@ -11,6 +11,7 @@ Route::prefix('api')->group(function () {
     Route::get('/getAvailableTranslations', 'App\Http\Controllers\TranslationController@getAvailableTranslations');
     Route::get('/getCVData', 'App\Http\Controllers\PersonalController@getCurriculumData');
     Route::post('/validateToken', 'App\Http\Controllers\UserController@validateToken')->name('validate_token');
+    Route::post('/registerNewUser', 'App\Http\Controllers\UserController@registerNewUser');
 
     // PASSWORDS
     Route::post('/forgotPassword', 'App\Http\Controllers\UserController@forgotPassword');

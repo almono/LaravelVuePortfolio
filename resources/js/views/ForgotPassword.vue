@@ -14,7 +14,7 @@
                 label-for="input-1"
                 class="login-label mb-0"
             >
-              <b-form-input class="login-input" id="input-1" v-model="userEmail" trim></b-form-input>
+              <b-form-input class="login-input" id="input-1" v-model="userEmail" trim required></b-form-input>
             </b-form-group>
 
             <div class="col-12 px-0 mb-2">
@@ -44,11 +44,12 @@ export default {
   },
   methods: {
     forgotPassword() {
+      this.userEmail = null
       this.$store.dispatch('authStore/forgotPassword',
       {
         userEmail: this.userEmail
       }).then((response) => {
-        console.log('test')
+
       })
     }
   }

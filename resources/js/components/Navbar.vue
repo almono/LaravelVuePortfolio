@@ -43,7 +43,7 @@
                 <span>{{ $t('navbarGuest', 'navbarGuest') }}</span>
               </template>
               <b-dropdown-item :to="{ path: '/login' }">{{ $t('loginLink', 'loginLink') }}</b-dropdown-item>
-              <b-dropdown-item href="#">{{ $t('registerLink', 'registerLink') }}</b-dropdown-item>
+              <b-dropdown-item :to="{ path: '/register' }">{{ $t('registerLink', 'registerLink') }}</b-dropdown-item>
             </b-nav-item-dropdown>
             <b-nav-item-dropdown v-else right>
               <!-- Using 'button-content' slot -->

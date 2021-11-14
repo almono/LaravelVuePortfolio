@@ -5,6 +5,7 @@ import store from './store'
 import Homepage from './views/Homepage.vue'
 import CV from './views/CV.vue'
 import Login from './views/Login.vue'
+import Register from './views/Register.vue'
 import ForgotPassword from './views/ForgotPassword.vue'
 import ResetPassword from './views/ResetPassword.vue'
 import Dashboard from './views/Dashboard'
@@ -51,6 +52,15 @@ let router = new Router({
             redirectLogged: true
           }
         },
+      {
+        path: '/register',
+        name: 'Register',
+        component: Register,
+        meta: {
+          requireAuth: false,
+          redirectLogged: true
+        }
+      },
         {
           path: '/forgot_password',
           name: 'ForgotPassword',

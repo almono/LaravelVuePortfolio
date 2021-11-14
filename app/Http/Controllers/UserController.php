@@ -587,6 +587,52 @@ class UserController extends Controller
         return response($result);
     }
 
+    public function registerNewUser(Request $request) {
+        $data = $request->all();
+        $result['status'] = 'error';
+
+        if(!isset($data['userEmail']) || !filter_var($data['userEmail'], FILTER_VALIDATE_EMAIL)) {
+            $result['message'] = 'invalidEmailFormat';
+            return response($result);
+        }
+
+        if(!isset($data['userPassword']) || is_null($data['userPassword'])) {
+            $result['message'] = 'passwordNotProvidedError';
+            return response($result);
+        }
+
+        $existingUser = User::where('email', $data['userEmail'])->get()->toArray();
+
+        if(!empty($existingUser) && !is_null($existingUser)) {
+            $result['message'] = 'userAlreadyExistsError';
+            return response($result);
+        } else {
+            $newUser = new User();
+            $newUser->email = $data['userEmail'];
+            $newUser->password = Hash::make($data['userPassword']);
+            $newUser->is_active = 0;
+            $newUser->role = 4;
+
+            Mail::send('emails.userRegistrationRequest', [], function($message) use ($data)
+            {
+                $message->to($data['userEmail']);
+                $message->subject('Your account ' . $data['userEmail'] . ' has been created!');
+            });
+
+            try {
+                $newUser->save();
+            } catch (\Exception $e) {
+                dd($e->getMessage());
+                $result['message'] = 'newUserRegistrationError';
+                return response($result);
+            }
+        }
+
+        $result['status'] = 'success';
+        $result['message'] = 'registrationRequestSent';
+        return response($result);
+    }
+
     private function guard()
     {
         return Auth::guard();

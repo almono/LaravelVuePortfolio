@@ -77,6 +77,12 @@ const actions = {
     return await axios.post(`${backendUrl()}/setNewPassword`, data).then(response => {
       return response.data
     })
+  },
+
+  async registerNewUser( context, data ) {
+    return await axios.post(`${backendUrl()}/registerNewUser`, data).then(response => {
+      return response.data
+    })
   }
 };
 
